@@ -36,17 +36,19 @@ object Lang {
           //I'd like to have a recursive subfunction taking just t,
           //but it's hard to write because it should also take S!
           App[s, t](subst(v, repl)(fun), subst(v, repl)(arg))
-        case Lam(w, body) =>
+        case l: Lam[s, t] =>
+          val w = l.x
+          val body = l.e
           if (w == v)
             t
           else {
             //This only works if w is not free in repl.
             //Otherwise, we need to use another w.
             //Lam(w, subst(v, repl)(body))
-            //To avoid implementing substitution
-            val x = freshVar[Any]() //Luckily we need this annotation.
-                                  //That's just God slapping in our face the fact that
-                                  //this is not well-typed.
+
+            //To avoid implementing freeVars, we just do another
+            //substitution with a free variable.
+            val x = freshVar[s]()
             Lam(x, subst(v, repl)(subst(w, x)(body)))
           }
         case Num(_) => t
