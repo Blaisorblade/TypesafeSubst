@@ -24,7 +24,8 @@ object Lang {
 
   def subst[S, T](v: Var[T], repl: Exp[T])(t: Exp[S]): Exp[S] =
       t match {
-        //Cool! Same insight as in the other interpreter.
+        //Cool! Same insight as in the other interpreter. Note that if I just
+        //match names, it won't typecheck.
         case _: v.type =>
           repl
         case w: Var[t] =>
@@ -49,7 +50,8 @@ object Lang {
             //To avoid implementing freeVars, we just do another
             //substitution with a free variable.
             val x = freshVar[s]()
-            Lam(x, subst(v, repl)(subst(w, x)(body)))
+            val alphaRenamedBody = subst(w, x)(body)
+            Lam(x, subst(v, repl)(alphaRenamedBody))
           }
         case Num(_) => t
         case Succ => t
