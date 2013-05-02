@@ -51,7 +51,7 @@ object Lang {
             //substitution with a free variable.
             val x = freshVar[s]()
             val alphaRenamedBody = subst(w, x)(body)
-            Lam(x, subst(v, repl)(alphaRenamedBody))
+            Lam[s, t](x, subst(v, repl)(alphaRenamedBody))
           }
         case Num(_) => t
         case Succ => t
