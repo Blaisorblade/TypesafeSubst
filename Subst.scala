@@ -40,7 +40,7 @@ object Lang {
         case l: Lam[s, t] =>
           val w = l.x
           val body = l.e
-          if (w == v)
+          if (w eq v) //Must check identity, for coherency with variable lookup.
             t
           else {
             //This only works if w is not free in repl.
