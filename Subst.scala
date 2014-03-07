@@ -2,7 +2,25 @@ package Subst
 
 trait Exp[T]
 
-case class Var[T](name: String) extends Exp[T]
+// We don't want structural but reference equality for variables, because the
+// evaluator uses reference equality (through its typed matches against
+// singleton types), so better not have the "wrong" equality available.
+case class Var[T](name: String) extends Exp[T] {
+  override def hashCode = System.identityHashCode(this)
+  override def equals(a: Any) = super.equals(a)
+}
+
+object VarTest extends scala.App {
+  val v1 = Var("")
+  val v2 = Var("")
+  val v3 = Var("")
+  println(v1 == v2)
+  println(v1 eq v2)
+  println(v1.hashCode)
+  println(v2.hashCode)
+  println(v3.hashCode)
+}
+
 case class Num(n: Int) extends Exp[Int]
 case object Succ extends Exp[Int => Int]
 
