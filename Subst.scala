@@ -1,6 +1,8 @@
 package Subst
 
-trait Exp[T]
+import scala.language.higherKinds
+
+trait Exp[T] extends Product
 
 // We don't want structural but reference equality for variables, because the
 // evaluator uses reference equality (through its typed matches against
@@ -33,7 +35,39 @@ case class Cons[T](car: Exp[T], cdr: Exp[List[T]]) extends Exp[List[T]]
 case class Null[T]() extends Exp[List[T]]
  */
 
-object Lang {
+/**
+ * Represent in Scala a particular kind of polymorphic functions called natural
+ * transformations.
+ * A natural transformation from A to B has type
+ * forall T. A[T] => B[T].
+ * This definition is also present in Scalaz/shapeless.
+ *
+ * A type-preserving rewrite rule can be given type Exp ~> Exp.
+ */
+trait ~>[-A[_], +B[_]] {
+  def apply[T](a: A[T]): B[T]
+}
+
+//A version of UntypedTraversal working on typed trees.
+trait TypedTraversal extends Reflection {
+  def mapSubtrees(transformer: Exp ~> Exp) = new (Exp ~> Exp) {
+    def apply[T](e: Exp[T]): Exp[T] = {
+      val subtrees = e.productIterator.toList map {
+        case subExp: Exp[t] => transformer(subExp)
+        case notExp => notExp
+      }
+      reflectiveCopy(e, subtrees: _*)
+    }
+  }
+
+  def traverse(transformer: Exp ~> Exp): Exp ~> Exp = new (Exp ~> Exp) {
+    def apply[T](e: Exp[T]): Exp[T] = {
+      transformer(mapSubtrees(traverse(transformer))(e))
+    }
+  }
+}
+
+object Lang extends TypedTraversal {
   var count = 0
   def freshVar[T](): Var[T] = {
     count += 1
@@ -76,6 +110,23 @@ object Lang {
       }
   def betaReduce[S, T](f: Lam[S, T], arg: Exp[S]): Exp[T] =
     subst(f.x, arg)(f.e)
+
+  def betaReduceT[T](term: Exp[T]): Exp[T] =
+    term match {
+      case App(l: Lam[s, t], arg) => betaReduce(l, arg)
+      case e => e
+    }
+  def betaReduceAnywhere =
+    traverse(new (Exp ~> Exp) {
+      def apply[T](term: Exp[T]): Exp[T] = betaReduceT(term)
+    })
+  def normalize[T](term: Exp[T]): Exp[T] = {
+    val newT = betaReduceAnywhere(term)
+    if (newT == term)
+      newT
+    else
+      normalize(newT)
+  }
 }
 
 object Examples {
