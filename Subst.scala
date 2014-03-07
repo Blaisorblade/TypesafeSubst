@@ -152,8 +152,14 @@ object Examples {
   val trueF = Lam(v, Lam(v2, v))
   val falseF = Lam(v, Lam(v2, v2))
   val fV = Var[Int => Int => Int]("f")
+
   val test = Lam(fV, App(App(fV, Num(1)), Num(2)))
   val testTrue = App(test, trueF)
   val testFalse = App(test, falseF)
+
   //val sound = eval(a, Empty)
+  import Lang.normalize
+  assert(normalize(a) == Num(1))
+  assert(normalize(testTrue) == Num(1))
+  assert(normalize(testFalse) == Num(2))
 }
