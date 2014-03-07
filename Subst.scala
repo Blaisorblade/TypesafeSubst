@@ -78,6 +78,11 @@ object Lang extends TypedTraversal {
         v.asInstanceOf[T]
       case _ => super.reflectiveCopy(t, args: _*)
     }
+    //Scalac also fails here:
+    /*t match {
+      case v @ Var(n) => v
+    }*/
+    //Tested on 2.10.1, 2.10.3, 2.11.0-M8
   }
 
   var count = 0
