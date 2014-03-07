@@ -49,7 +49,10 @@ trait Reflection {
           args.toArray.asInstanceOf[Array[_ <: AnyRef]]: _*)).asInstanceOf[T]
       }
     } else {
-      throw new IllegalArgumentException(s"${count(t.productArity, "argument")} expected but ${args.length} given")
+      arityError(t.productArity, args.length)
     }
   }
+
+  def arityError(expected: Int, given: Int) =
+    throw new IllegalArgumentException(s"${count(expected, "argument")} expected but ${given} given")
 }
