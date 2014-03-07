@@ -85,5 +85,12 @@ object Examples {
   val f = Lam(v, v)
   val a = App(f, Num(1))
 
+  val v2 = Var[Int]("v2")
+  val trueF = Lam(v, Lam(v2, v))
+  val falseF = Lam(v, Lam(v2, v2))
+  val fV = Var[Int => Int => Int]("f")
+  val test = Lam(fV, App(App(fV, Num(1)), Num(2)))
+  val testTrue = App(test, trueF)
+  val testFalse = App(test, falseF)
   //val sound = eval(a, Empty)
 }
