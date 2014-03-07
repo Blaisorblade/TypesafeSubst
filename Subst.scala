@@ -68,6 +68,18 @@ trait TypedTraversal extends Reflection {
 }
 
 object Lang extends TypedTraversal {
+  /*
+   * Avoid recreating vars.
+   */
+  override def reflectiveCopy[T <: Product](t: T, args: Any*): T = {
+    (t, args) match {
+      case (v @ Var(n), Seq(n2)) if n == n2 =>
+        //This cast shouldn't be needed.
+        v.asInstanceOf[T]
+      case _ => super.reflectiveCopy(t, args: _*)
+    }
+  }
+
   var count = 0
   def freshVar[T](): Var[T] = {
     count += 1
