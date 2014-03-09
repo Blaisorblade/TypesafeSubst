@@ -12,17 +12,6 @@ case class Var[T](name: String) extends Exp[T] {
   override def equals(a: Any) = super.equals(a)
 }
 
-object VarTest extends scala.App {
-  val v1 = Var("")
-  val v2 = Var("")
-  val v3 = Var("")
-  println(v1 == v2)
-  println(v1 eq v2)
-  println(v1.hashCode)
-  println(v2.hashCode)
-  println(v3.hashCode)
-}
-
 case class Num(n: Int) extends Exp[Int]
 case object Succ extends Exp[Int => Int]
 
@@ -146,7 +135,22 @@ object Lang extends TypedTraversal {
   }
 }
 
-object Examples {
+
+object VarTest {
+  def test() = {
+    val v1 = Var("")
+    val v2 = Var("")
+    val v3 = Var("")
+    println(v1 == v2)
+    println(v1 eq v2)
+    println(v1.hashCode)
+    println(v2.hashCode)
+    println(v3.hashCode)
+  }
+}
+
+object Examples extends scala.App {
+  VarTest.test()
   //import Lang._
 
   val v = Var[Int]("v")
