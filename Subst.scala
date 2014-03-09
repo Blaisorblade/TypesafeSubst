@@ -1,5 +1,13 @@
 package Subst
 
+/**
+  * Implement typesafe substitution using the same insights as in the type-safe
+  * interpreter from Burak et al. (2007). To test the implementation, build
+  * beta-reduction and normalization on top of it.
+  *
+  * Emir, B., Odersky, M., and Williams, J. Matching objects with patterns. In
+  * ECOOP. Springer-Verlag, 2007, pp. 273–298.
+  */
 import traversal._
 
 import scala.language.higherKinds
