@@ -1,7 +1,7 @@
 TypesafeSubst
 =============
 
-This code implements typesafe substitution using the same insights as in the type-safe
+This code implements typesafe substitution in Scala using the same insights as in the type-safe
 interpreter from Burak et al. (2007).
 
 To demonstrate how this substitution can be used, we build beta-reduction and normalization on top of it.
