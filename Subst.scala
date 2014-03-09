@@ -1,5 +1,7 @@
 package Subst
 
+import traversal._
+
 import scala.language.higherKinds
 
 trait Exp[T] extends Product
@@ -24,39 +26,10 @@ case class Cons[T](car: Exp[T], cdr: Exp[List[T]]) extends Exp[List[T]]
 case class Null[T]() extends Exp[List[T]]
  */
 
-/**
- * Represent in Scala a particular kind of polymorphic functions called natural
- * transformations.
- * A natural transformation from A to B has type
- * forall T. A[T] => B[T].
- * This definition is also present in Scalaz/shapeless.
- *
- * A type-preserving rewrite rule can be given type Exp ~> Exp.
- */
-trait ~>[-A[_], +B[_]] {
-  def apply[T](a: A[T]): B[T]
-}
-
-//A version of UntypedTraversal working on typed trees.
-trait TypedTraversal extends Reflection {
-  def mapSubtrees(transformer: Exp ~> Exp) = new (Exp ~> Exp) {
-    def apply[T](e: Exp[T]): Exp[T] = {
-      val subtrees = e.productIterator.toList map {
-        case subExp: Exp[t] => transformer(subExp)
-        case notExp => notExp
-      }
-      reflectiveCopy(e, subtrees: _*)
-    }
-  }
-
-  def traverse(transformer: Exp ~> Exp): Exp ~> Exp = new (Exp ~> Exp) {
-    def apply[T](e: Exp[T]): Exp[T] = {
-      transformer(mapSubtrees(traverse(transformer))(e))
-    }
-  }
-}
-
 object Lang extends TypedTraversal {
+  type Exp[T] = Subst.Exp[T]
+  val Exp = Extractor.textractor[Exp[_]] { case e: Exp[_] => Some(e); case _ => None }
+
   /*
    * Avoid recreating vars.
    */
